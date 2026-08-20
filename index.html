@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wonder Pet — Interactive Virtual Pet Game</title>
+    <meta name="description" content="An interactive virtual pet simulation game with real-time care stats, mood animations, mini-games, and leveling systems. Created by Andrie Deuna.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Fredoka', sans-serif; }
+        .bouncy { animation: bounce 2s infinite ease-in-out; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-12px) scale(1.04, 0.96); }
+        }
+        .wiggle { animation: wiggle 0.6s infinite ease-in-out; }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        .pulse-heart { animation: pulseHeart 1.2s infinite ease-in-out; }
+        @keyframes pulseHeart {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+        }
+        .stat-bar-fill { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 min-h-screen text-white flex flex-col justify-between p-4 sm:p-6 select-none overflow-x-hidden">
+
+    <!-- Header Navigation -->
+    <header class="max-w-4xl w-full mx-auto flex justify-between items-center bg-white/10 backdrop-blur-md px-6 py-4 rounded-3xl border border-white/10 shadow-2xl">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-pink-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-pink-500/30">
+                🐾
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-300">Wonder Pet</h1>
+                <p class="text-xs text-purple-200/70">Virtual Companion Game</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="bg-black/30 px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-2">
+                <span class="text-yellow-400 text-lg">🪙</span>
+                <span id="coinsDisplay" class="font-bold text-yellow-300">150</span>
+            </div>
+            <div class="bg-purple-900/60 px-4 py-2 rounded-2xl border border-purple-400/30 flex items-center gap-2">
+                <span class="text-purple-300 text-xs font-semibold uppercase">Lvl</span>
+                <span id="levelDisplay" class="font-extrabold text-pink-300 text-lg">1</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="max-w-4xl w-full mx-auto my-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        
+        <!-- Left Column: Care Stats -->
+        <div class="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/10 flex flex-col justify-between gap-4 shadow-xl">
+            <h2 class="text-lg font-bold text-purple-200 flex items-center gap-2">
+                <i class="fas fa-heartbeat text-pink-400"></i> Vital Stats
+            </h2>
+
+            <!-- Hunger -->
+            <div>
+                <div class="flex justify-between text-sm mb-1 font-semibold">
+                    <span class="flex items-center gap-2"><i class="fas fa-utensils text-orange-400"></i> Hunger</span>
+                    <span id="hungerValue">80%</span>
+                </div>
+                <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden p-0.5 border border-white/5">
+                    <div id="hungerBar" class="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full stat-bar-fill" style="width: 80%;"></div>
+                </div>
+            </div>
+
+            <!-- Happiness -->
+            <div>
+                <div class="flex justify-between text-sm mb-1 font-semibold">
+                    <span class="flex items-center gap-2"><i class="fas fa-smile text-yellow-400"></i> Happiness</span>
+                    <span id="happinessValue">90%</span>
+                </div>
+                <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden p-0.5 border border-white/5">
+                    <div id="happinessBar" class="h-full bg-gradient-to-r from-yellow-400 to-amber-300 rounded-full stat-bar-fill" style="width: 90%;"></div>
+                </div>
+            </div>
+
+            <!-- Energy -->
+            <div>
+                <div class="flex justify-between text-sm mb-1 font-semibold">
+                    <span class="flex items-center gap-2"><i class="fas fa-bolt text-cyan-400"></i> Energy</span>
+                    <span id="energyValue">75%</span>
+                </div>
+                <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden p-0.5 border border-white/5">
+                    <div id="energyBar" class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full stat-bar-fill" style="width: 75%;"></div>
+                </div>
+            </div>
+
+            <!-- Cleanliness -->
+            <div>
+                <div class="flex justify-between text-sm mb-1 font-semibold">
+                    <span class="flex items-center gap-2"><i class="fas fa-soap text-blue-300"></i> Hygiene</span>
+                    <span id="hygieneValue">85%</span>
+                </div>
+                <div class="w-full bg-black/40 h-4 rounded-full overflow-hidden p-0.5 border border-white/5">
+                    <div id="hygieneBar" class="h-full bg-gradient-to-r from-blue-300 to-indigo-400 rounded-full stat-bar-fill" style="width: 85%;"></div>
+                </div>
+            </div>
+
+            <!-- XP Progress -->
+            <div class="mt-2 pt-3 border-t border-white/10">
+                <div class="flex justify-between text-xs mb-1 font-semibold text-purple-300">
+                    <span>XP Progress</span>
+                    <span id="xpValue">45/100</span>
+                </div>
+                <div class="w-full bg-black/40 h-2.5 rounded-full overflow-hidden p-0.5 border border-white/5">
+                    <div id="xpBar" class="h-full bg-gradient-to-r from-pink-500 to-purple-400 rounded-full stat-bar-fill" style="width: 45%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Column: Pet Stage Room -->
+        <div id="petStage" class="md:col-span-2 bg-gradient-to-b from-purple-900/40 to-black/40 backdrop-blur-xl p-8 rounded-3xl border border-white/15 flex flex-col items-center justify-between min-h-[380px] relative overflow-hidden shadow-2xl">
+            
+            <!-- Night/Day Lighting Overlay -->
+            <div id="nightOverlay" class="absolute inset-0 bg-indigo-950/80 pointer-events-none transition-opacity duration-700 opacity-0 z-10 flex items-center justify-center">
+                <div class="text-4xl text-yellow-200 animate-pulse">💤 Zzz...</div>
+            </div>
+
+            <!-- Status Mood Bubble -->
+            <div id="moodBubble" class="bg-white text-gray-800 px-4 py-2 rounded-2xl shadow-xl font-bold text-sm flex items-center gap-2 animate-bounce z-20">
+                <span id="moodIcon">😺</span>
+                <span id="moodText">Feeling Great!</span>
+            </div>
+
+            <!-- Interactive Pet Avatar -->
+            <div id="petCharacter" class="my-auto cursor-pointer bouncy transition-all duration-300 relative z-20 group">
+                <svg id="petSvg" class="w-44 h-44 drop-shadow-[0_15px_25px_rgba(236,72,153,0.35)] transition-transform duration-300 group-hover:scale-110" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Body -->
+                    <ellipse cx="100" cy="110" rx="65" ry="55" fill="url(#petGrad)" />
+                    <!-- Ears -->
+                    <polygon points="50,65 30,25 70,45" fill="#f472b6" />
+                    <polygon points="150,65 170,25 130,45" fill="#f472b6" />
+                    <polygon points="52,60 38,32 66,47" fill="#fbcfe8" />
+                    <polygon points="148,60 162,32 134,47" fill="#fbcfe8" />
+                    <!-- Eyes -->
+                    <circle cx="75" cy="95" r="10" fill="#1e1b4b" />
+                    <circle cx="125" cy="95" r="10" fill="#1e1b4b" />
+                    <circle cx="78" cy="92" r="3.5" fill="white" />
+                    <circle cx="128" cy="92" r="3.5" fill="white" />
+                    <!-- Cheeks -->
+                    <circle cx="60" cy="110" r="8" fill="#fb7185" opacity="0.6" />
+                    <circle cx="140" cy="110" r="8" fill="#fb7185" opacity="0.6" />
+                    <!-- Mouth -->
+                    <path id="petMouth" d="M 90 115 Q 100 125 110 115" stroke="#1e1b4b" stroke-width="4" stroke-linecap="round" fill="none" />
+                    <!-- Paws -->
+                    <ellipse cx="65" cy="155" rx="14" ry="10" fill="#f472b6" />
+                    <ellipse cx="135" cy="155" rx="14" ry="10" fill="#f472b6" />
+
+                    <defs>
+                        <linearGradient id="petGrad" x1="35" y1="55" x2="165" y2="165" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#f472b6" />
+                            <stop offset="1" stop-color="#c084fc" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+
+                <!-- Floating Hearts/Particles Container -->
+                <div id="particleContainer" class="absolute inset-0 pointer-events-none z-30"></div>
+            </div>
+
+            <!-- Action Controls Grid -->
+            <div class="w-full grid grid-cols-2 sm:grid-cols-4 gap-3 z-20">
+                <button id="feedBtn" class="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold py-3 px-4 rounded-2xl shadow-lg shadow-orange-500/25 active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-hamburger"></i> Feed
+                </button>
+                <button id="playBtn" class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold py-3 px-4 rounded-2xl shadow-lg shadow-pink-500/25 active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-gamepad"></i> Play
+                </button>
+                <button id="sleepBtn" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-2xl shadow-lg shadow-indigo-500/25 active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-moon"></i> Sleep
+                </button>
+                <button id="washBtn" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-3 px-4 rounded-2xl shadow-lg shadow-cyan-500/25 active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-soap"></i> Wash
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-4xl w-full mx-auto text-center text-xs text-purple-300/60 py-3">
+        &copy; 2026 Wonder Pet — Created by <a href="https://github.com/Worstace01" target="_blank" class="underline hover:text-white">Andrie Deuna</a>
+    </footer>
+
+    <!-- Mini-Game Modal overlay -->
+    <div id="gameModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+        <div class="bg-gradient-to-b from-purple-900 to-slate-900 border border-purple-400/30 p-6 rounded-3xl max-w-md w-full text-center relative shadow-2xl">
+            <button id="closeGameBtn" class="absolute top-4 right-4 text-purple-300 hover:text-white text-xl">&times;</button>
+            <h3 class="text-2xl font-bold text-pink-300 mb-2">⭐ Catch The Stars!</h3>
+            <p class="text-sm text-purple-200 mb-4">Click the falling stars before they disappear to win Coins & Happiness!</p>
+            <div id="gameCanvas" class="w-full h-64 bg-black/50 rounded-2xl border border-white/10 relative overflow-hidden my-4 cursor-pointer"></div>
+            <div class="flex justify-between items-center text-sm font-bold px-2">
+                <span>Score: <span id="gameScore" class="text-yellow-300">0</span></span>
+                <span>Time: <span id="gameTimer" class="text-pink-300">15</span>s</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
